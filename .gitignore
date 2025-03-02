@@ -1,10 +1,13 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,git
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,git
 
+.DS_Store
+
 ### Git ###
 # Created by git for backups. To disable backups in Git:
 # $ git config --global mergetool.keepBackup false
 *.orig
+
 
 # Created by git when using merge tools for conflicts
 *.BACKUP.*
