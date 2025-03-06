@@ -10,4 +10,4 @@ image = pipeline("""
                  The plush toy is round and soft and wears the red scarf around its neck. The plush toy is short, and has a long nose.
                  The eyes of the polar bear are like watermelon seeds.
                  """).images[0]
-image.save("new{}.png".format(uuid.uuid1()))
+image.save("outputs/new{}.png".format(uuid.uuid1()))

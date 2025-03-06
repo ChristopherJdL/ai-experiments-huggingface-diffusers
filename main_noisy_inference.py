@@ -60,7 +60,7 @@ for i, t in enumerate(tqdm.tqdm(scheduler.timesteps)):
         pil = display_sample(sample, i + 1)
 
 final_image = display_sample(sample, len(scheduler.timesteps))
-final_image.save(f"final_noisy_inference_{id_inference}_final.png")
+final_image.save(f"outputs/final_noisy_inference_{id_inference}_final.png")
 
 plt.ioff()
 plt.show()
