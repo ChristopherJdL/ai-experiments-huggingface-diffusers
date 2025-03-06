@@ -1,4 +1,0 @@
-# about installed FMs
-they are located in ~/.cache/huggingface so better empty them when necessary
-# launch the script
-accelerate launch --cpu ./main_abei_training.py
