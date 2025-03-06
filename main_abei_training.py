@@ -18,6 +18,10 @@ transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
+tensorFormat = "cuda"
+if os.uname().sysname == 'Darwin':
+    tensorFormat = "cpu"
+
 #Here, we initialize the dataset object using the huggingface library.
 dataset = Dataset.from_csv(path_or_paths="abei-images/dataset.csv", split="train")
 
@@ -71,13 +75,13 @@ Important: Values represent normalized intensity, not actual bytes (0.0=black, 1
 """
 def initialize_tensor(image):
     threeDimensionTensor = transform(image)
-    fourDimensionTensor = threeDimensionTensor.unsqueeze(0).to("cpu")
+    fourDimensionTensor = threeDimensionTensor.unsqueeze(0).to(tensorFormat)
     return fourDimensionTensor
 
 def make_noisy_image(sample_image, timesteps):
     #a scheduler is a class that decides how much noise to apply to an image.
     noise_scheduler = DDPMScheduler(num_train_timesteps=1000)
-    noise = torch.randn(sample_image.shape).to("cpu")
+    noise = torch.randn(sample_image.shape).to(tensorFormat)
     noisy_image = noise_scheduler.add_noise(sample_image, noise, timesteps)
     return noisy_image, noise, noise_scheduler
 
@@ -120,7 +124,7 @@ def initialize_cnn_model():
         "UpBlock2D",
         "UpBlock2D",
     ),
-).to("cpu")
+).to(tensorFormat)
 
 # The loss, in computer vision learning, defines the difference between the prediction and the reality.
 def calculate_loss(actual_noise):
@@ -132,7 +136,7 @@ sample_image = initialize_tensor(dataset[0]["image"])
 
 #The timesteps is a tensor as well, so we have to convert it to Metal-compatible variable. 
 #That's because every tensor has to be with mps in order to be exploitable withtin the GPU.
-timesteps = torch.LongTensor([50]).to("cpu")
+timesteps = torch.LongTensor([50]).to(tensorFormat)
 
 noisy_image, noise, noise_scheduler = make_noisy_image(sample_image, timesteps)
 sample = make_PIL_sample(noisy_image)
@@ -171,7 +175,7 @@ def evaluate(config, epoch, pipeline):#ranger après
     # The default pipeline output type is `List[PIL.Image]`
     images = pipeline(
         batch_size=config.eval_batch_size,
-        generator=torch.Generator(device="cpu").manual_seed(config.seed), # Use a separate torch generator to avoid rewinding the random state of the main training loop
+        generator=torch.Generator(device=tensorFormat).manual_seed(config.seed), # Use a separate torch generator to avoid rewinding the random state of the main training loop
     ).images
 
     # Make a grid out of the images
